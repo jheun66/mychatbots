@@ -79,9 +79,6 @@ def load_conversations():
 
 questions, answers = load_conversations()
 
-print('Sample question: {}'.format(questions[20]))
-print('Sample answer: {}'.format(answers[20]))
-
 # Build tokenizer using tfds for both questions and answers
 tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
     questions + answers, target_vocab_size=2**13)
@@ -92,11 +89,9 @@ START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 # Vocabulary size plus start and end token
 VOCAB_SIZE = tokenizer.vocab_size + 2
 
-print('Tokenized sample question: {}'.format(tokenizer.encode(questions[20])))
 
 # Maximum sentence length
 MAX_LENGTH = 40
-
 
 # Tokenize, filter and pad sentences
 def tokenize_and_filter(inputs, outputs):
@@ -121,15 +116,6 @@ def tokenize_and_filter(inputs, outputs):
 
 questions, answers = tokenize_and_filter(questions, answers)
 
-print('Sample question: {}'.format(questions[20]))
-print('Sample answer: {}'.format(answers[20]))
-
-print('Vocab size: {}'.format(VOCAB_SIZE))
-print('Number of samples: {}'.format(len(questions)))
-
-
-###########################################################################
-
 
 BATCH_SIZE = 64
 BUFFER_SIZE = 20000
@@ -151,4 +137,4 @@ dataset = dataset.shuffle(BUFFER_SIZE)
 dataset = dataset.batch(BATCH_SIZE)
 dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
-print(dataset)
+
