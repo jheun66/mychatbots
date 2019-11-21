@@ -117,6 +117,7 @@ def tokenize_and_filter(inputs, outputs):
 questions, answers = tokenize_and_filter(questions, answers)
 
 print(questions[20])
+print(answers[20])
 
 BATCH_SIZE = 64
 BUFFER_SIZE = 20000
