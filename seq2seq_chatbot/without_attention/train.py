@@ -8,6 +8,7 @@ from model import build_train_model, make_inference_models
 path_questions = "./questions.p"
 path_answers = "./answers.p"
 path_voc_size = "./voc_size.p"
+path_tokenizer = "./tokenizer.p"
 MODEL_WEIGHT_FILE = "./model.h5"
 
 BATCH_SIZE = 64
@@ -35,11 +36,12 @@ def generate_batch(encoder_input_data, decoder_input_data):
 
 if __name__ == "__main__":
 
-    #questions, answers, VOCAB_SIZE = tokenize_and_filter()
+    #questions, answers, VOCAB_SIZE, tokenizer = tokenize_and_filter()
 
     #pickle.dump(questions, open(path_questions, "wb"))
     #pickle.dump(answers, open(path_answers, "wb"))
     #pickle.dump(VOCAB_SIZE, open(path_voc_size, "wb"))
+    #pickle.dump(tokenizer, open(path_tokenizer, "wb"))
 
 
     questions = pickle.load(open(path_questions, "rb"))
