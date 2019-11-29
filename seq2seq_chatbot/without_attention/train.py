@@ -2,14 +2,13 @@ import tensorflow as tf
 import numpy as np
 import pickle
 from datasets import tokenize_and_filter
-from model import build_train_model, make_inference_models
+from model import build_train_model
 
 
 path_questions = "./questions.p"
 path_answers = "./answers.p"
-path_voc_size = "./voc_size.p"
 path_tokenizer = "./tokenizer.p"
-MODEL_WEIGHT_FILE = "./model.h5"
+MODEL_WEIGHT_FILE = "./seq2seq.h5"
 
 BATCH_SIZE = 64
 
@@ -36,18 +35,11 @@ def generate_batch(encoder_input_data, decoder_input_data):
 
 if __name__ == "__main__":
 
-    #questions, answers, VOCAB_SIZE, tokenizer = tokenize_and_filter()
-
-    #pickle.dump(questions, open(path_questions, "wb"))
-    #pickle.dump(answers, open(path_answers, "wb"))
-    #pickle.dump(VOCAB_SIZE, open(path_voc_size, "wb"))
-    #pickle.dump(tokenizer, open(path_tokenizer, "wb"))
-
-
     questions = pickle.load(open(path_questions, "rb"))
     answers = pickle.load(open(path_answers, "rb"))
-    VOCAB_SIZE = pickle.load(open(path_voc_size, "rb"))
+    tokenizer = pickle.load(open(path_tokenizer, "rb"))
 
+    VOCAB_SIZE = tokenizer.vocab_size + 2
     model = build_train_model(VOCAB_SIZE)
 
     train_gen = generate_batch(questions, answers)

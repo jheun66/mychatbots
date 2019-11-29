@@ -20,6 +20,7 @@ import tensorflow_datasets as tfds
 
 import os
 import re
+import pickle
 import numpy as np
 
 path_to_zip = tf.keras.utils.get_file(
@@ -34,6 +35,10 @@ path_to_dataset = os.path.join(
 path_to_movie_lines = os.path.join(path_to_dataset, 'movie_lines.txt')
 path_to_movie_conversations = os.path.join(path_to_dataset,
                                            'movie_conversations.txt')
+
+path_questions = "./questions.p"
+path_answers = "./answers.p"
+path_tokenizer = "./tokenizer.p"
 
 
 def preprocess_sentence(sentence):
@@ -74,7 +79,7 @@ def load_conversations(MAX_SAMPLES):
 
 # Tokenize, filter and pad sentences
 def tokenize_and_filter():
-    inputs, outputs = load_conversations(MAX_SAMPLES=25000)
+    inputs, outputs = load_conversations(MAX_SAMPLES=100000)
 
     # Build tokenizer using tfds for both questions and answers
     tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
@@ -106,7 +111,14 @@ def tokenize_and_filter():
     tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
         tokenized_outputs, maxlen=MAX_LENGTH, padding='post')
   
-    return tokenized_inputs, tokenized_outputs, VOCAB_SIZE, tokenizer
+    return tokenized_inputs, tokenized_outputs, tokenizer
 
 
+if __name__ == "__main__":
+    
+    questions, answers, tokenizer = tokenize_and_filter()
+
+    pickle.dump(questions, open(path_questions, "wb"))
+    pickle.dump(answers, open(path_answers, "wb"))
+    pickle.dump(tokenizer, open(path_tokenizer, "wb"))
 
