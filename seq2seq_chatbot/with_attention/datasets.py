@@ -21,12 +21,6 @@ import tensorflow_datasets as tfds
 import os
 import re
 import numpy as np
-import pickle
-
-# 파일 기준 경로
-path_questions = "./questions.p"
-path_answers = "./answers.p"
-path_voc_size = "./voc_size.p"
 
 path_to_zip = tf.keras.utils.get_file(
     'cornell_movie_dialogs.zip',
@@ -114,11 +108,5 @@ def tokenize_and_filter():
   
     return tokenized_inputs, tokenized_outputs, VOCAB_SIZE, tokenizer
 
-if __name__ == "__main__":
 
-    questions, answers, VOCAB_SIZE = tokenize_and_filter()
-
-    pickle.dump(questions, open(path_questions, "wb"))
-    pickle.dump(answers, open(path_answers, "wb"))
-    pickle.dump(VOCAB_SIZE, open(path_voc_size, "wb"))
 

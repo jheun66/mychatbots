@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import pickle
+from model import Encoder, Decoder
 from datasets import tokenize_and_filter
 
 # 파일 기준 경로
@@ -10,24 +11,7 @@ path_voc_size = "./voc_size.p"
 MODEL_WEIGHT_FILE = "./model.h5"
 
 def build_train_model(vocab_size):
-    encoder_inputs = tf.keras.layers.Input(shape=(None, ), dtype='int32',)
-    encoder_embedding =  tf.keras.layers.Embedding( vocab_size, 200 , mask_zero=True )(encoder_inputs)
-    _ , state_h , state_c = tf.keras.layers.LSTM( 200 , return_state=True )( encoder_embedding )
-    encoder_states = [ state_h , state_c ]
 
-    decoder_inputs = tf.keras.layers.Input(shape=(None, ), dtype='int32',)
-    decoder_embedding = tf.keras.layers.Embedding( vocab_size, 200 , mask_zero=True) (decoder_inputs)
-    decoder_lstm = tf.keras.layers.LSTM( 200 , return_state=True , return_sequences=True )
-    decoder_outputs , _ , _ = decoder_lstm ( decoder_embedding , initial_state=encoder_states )
-    decoder_dense = tf.keras.layers.Dense( vocab_size , activation=tf.keras.activations.softmax )
-    output = decoder_dense ( decoder_outputs )
-    
-    model = tf.keras.models.Model([encoder_inputs, decoder_inputs], output )
-
-    model.compile(optimizer=tf.keras.optimizers.RMSprop(), loss='categorical_crossentropy')
-
-    model.summary()
-    
     return model
 
 
@@ -54,6 +38,13 @@ def generate_batch(encoder_input_data, decoder_input_data, BATCH_SIZE):
 
 if __name__ == "__main__":
 
+    #questions, answers, VOCAB_SIZE = tokenize_and_filter()
+
+    #pickle.dump(questions, open(path_questions, "wb"))
+    #pickle.dump(answers, open(path_answers, "wb"))
+    #pickle.dump(VOCAB_SIZE, open(path_voc_size, "wb"))
+
+
     questions = pickle.load(open(path_questions, "rb"))
     answers = pickle.load(open(path_answers, "rb"))
     VOCAB_SIZE = pickle.load(open(path_voc_size, "rb"))
@@ -67,7 +58,7 @@ if __name__ == "__main__":
 
     model.fit_generator(generator= train_gen,
                     steps_per_epoch=train_num_batches,
-                    epochs=100,
+                    epochs=20,
                     verbose=1)
 
     model.save_weights(MODEL_WEIGHT_FILE)

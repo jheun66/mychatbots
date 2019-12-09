@@ -1,6 +1,6 @@
 import tensorflow as tf
 import pickle
-from model import build_train_model, make_inference_models
+from train import build_train_model
 from datasets import preprocess_sentence
 tf.keras.backend.clear_session()
 
