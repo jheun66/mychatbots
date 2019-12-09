@@ -20,9 +20,9 @@ import tensorflow_datasets as tfds
 
 import os
 import re
+import pickle
 import numpy as np
-
-import matplotlib.pyplot as plt
+import pickle
 
 path_to_zip = tf.keras.utils.get_file(
     'cornell_movie_dialogs.zip',
@@ -37,9 +37,10 @@ path_to_movie_lines = os.path.join(path_to_dataset, 'movie_lines.txt')
 path_to_movie_conversations = os.path.join(path_to_dataset,
                                            'movie_conversations.txt')
 
+path_questions = "./questions.p"
+path_answers = "./answers.p"
+path_tokenizer = "./tokenizer.p"
 
-# Maximum number of samples to preprocess
-MAX_SAMPLES = 25000
 
 def preprocess_sentence(sentence):
     sentence = sentence.lower().strip()
@@ -73,28 +74,25 @@ def load_conversations():
         for i in range(len(conversation) - 1):
             inputs.append(preprocess_sentence(id2line[conversation[i]]))
             outputs.append(preprocess_sentence(id2line[conversation[i + 1]]))
-            if len(inputs) >= MAX_SAMPLES:
-                return inputs, outputs
     return inputs, outputs
 
-questions, answers = load_conversations()
-
-# Build tokenizer using tfds for both questions and answers
-tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
-    questions + answers, target_vocab_size=2**13)
-
-# Define start and end token to indicate the start and end of a sentence
-START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
-
-# Vocabulary size plus start and end token
-VOCAB_SIZE = tokenizer.vocab_size + 2
-
-
-# Maximum sentence length
-MAX_LENGTH = 40
-
 # Tokenize, filter and pad sentences
-def tokenize_and_filter(inputs, outputs):
+def tokenize_and_filter():
+    inputs, outputs = load_conversations()
+
+    # Build tokenizer using tfds for both questions and answers
+    tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
+        inputs + outputs, target_vocab_size=2**15)
+    
+    # Define start and end token to indicate the start and end of a sentence
+    START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
+
+    # Vocabulary size plus start and end token
+    VOCAB_SIZE = tokenizer.vocab_size + 2
+
+    # Maximum sentence length
+    MAX_LENGTH = 40
+
     tokenized_inputs, tokenized_outputs = [], []
   
     for (sentence1, sentence2) in zip(inputs, outputs):
@@ -112,31 +110,14 @@ def tokenize_and_filter(inputs, outputs):
     tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
         tokenized_outputs, maxlen=MAX_LENGTH, padding='post')
   
-    return tokenized_inputs, tokenized_outputs
+    return tokenized_inputs, tokenized_outputs, tokenizer
 
-questions, answers = tokenize_and_filter(questions, answers)
 
-print(questions[20])
-print(answers[20])
+if __name__ == "__main__":
 
-BATCH_SIZE = 64
-BUFFER_SIZE = 20000
+    questions, answers, tokenizer = tokenize_and_filter()
 
-# decoder inputs use the previous target as input
-# remove START_TOKEN from targets
-dataset = tf.data.Dataset.from_tensor_slices((
-    {
-        'inputs': questions,
-        'dec_inputs': answers[:, :-1]
-    },
-    {
-        'outputs': answers[:, 1:]
-    },
-))
-
-dataset = dataset.cache()
-dataset = dataset.shuffle(BUFFER_SIZE)
-dataset = dataset.batch(BATCH_SIZE)
-dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
-
+    pickle.dump(questions, open(path_questions, "wb"))
+    pickle.dump(answers, open(path_answers, "wb"))
+    pickle.dump(tokenizer, open(path_tokenizer, "wb"))
 

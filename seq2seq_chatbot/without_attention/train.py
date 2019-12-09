@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     model.fit_generator(generator= train_gen,
                     steps_per_epoch=train_num_batches,
-                    epochs=100,
+                    epochs=20,
                     verbose=1)
 
     model.save_weights(MODEL_WEIGHT_FILE)
