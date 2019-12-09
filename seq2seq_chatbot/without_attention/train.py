@@ -2,12 +2,22 @@ import tensorflow as tf
 import numpy as np
 import pickle
 from datasets import tokenize_and_filter
+<<<<<<< HEAD
+=======
+from model import build_train_model
+
+>>>>>>> ef8df6e3fff984f6cdc282084fcc05f39da7f630
 
 # 파일 기준 경로
 path_questions = "./questions.p"
 path_answers = "./answers.p"
+<<<<<<< HEAD
 path_voc_size = "./voc_size.p"
 MODEL_WEIGHT_FILE = "./model.h5"
+=======
+path_tokenizer = "./tokenizer.p"
+MODEL_WEIGHT_FILE = "./seq2seq.h5"
+>>>>>>> ef8df6e3fff984f6cdc282084fcc05f39da7f630
 
 def build_train_model(vocab_size):
     encoder_inputs = tf.keras.layers.Input(shape=(None, ), dtype='int32',)
@@ -56,8 +66,9 @@ if __name__ == "__main__":
 
     questions = pickle.load(open(path_questions, "rb"))
     answers = pickle.load(open(path_answers, "rb"))
-    VOCAB_SIZE = pickle.load(open(path_voc_size, "rb"))
+    tokenizer = pickle.load(open(path_tokenizer, "rb"))
 
+    VOCAB_SIZE = tokenizer.vocab_size + 2
     model = build_train_model(VOCAB_SIZE)
     
     BATCH_SIZE = 64
