@@ -4,12 +4,12 @@ from train import build_train_model
 from datasets import preprocess_sentence
 tf.keras.backend.clear_session()
 
-MODEL_WEIGHT_FILE = "./model.h5"
-path_voc_size = "./voc_size.p"
+MODEL_WEIGHT_FILE = "./seq2seq.h5"
 path_tokenizer = "./tokenizer.p"
 
-VOCAB_SIZE = pickle.load(open(path_voc_size, "rb"))
+
 tokenizer = pickle.load(open(path_tokenizer, "rb"))
+VOCAB_SIZE = tokenizer.vocab_size + 2
 
 model = build_train_model(VOCAB_SIZE)
 
@@ -18,8 +18,7 @@ model.load_weights(MODEL_WEIGHT_FILE)
 def evaluate(sentence):
     sentence = preprocess_sentence(sentence)
 
-    START_TOKEN = [VOCAB_SIZE - 2]
-    END_TOKEN = [VOCAB_SIZE - 1]
+    START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 
     sentence = tf.expand_dims(
         START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)

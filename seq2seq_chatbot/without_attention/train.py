@@ -2,32 +2,22 @@ import tensorflow as tf
 import numpy as np
 import pickle
 from datasets import tokenize_and_filter
-<<<<<<< HEAD
-=======
-from model import build_train_model
-
->>>>>>> ef8df6e3fff984f6cdc282084fcc05f39da7f630
 
 # 파일 기준 경로
 path_questions = "./questions.p"
 path_answers = "./answers.p"
-<<<<<<< HEAD
-path_voc_size = "./voc_size.p"
-MODEL_WEIGHT_FILE = "./model.h5"
-=======
 path_tokenizer = "./tokenizer.p"
 MODEL_WEIGHT_FILE = "./seq2seq.h5"
->>>>>>> ef8df6e3fff984f6cdc282084fcc05f39da7f630
 
 def build_train_model(vocab_size):
     encoder_inputs = tf.keras.layers.Input(shape=(None, ), dtype='int32',)
-    encoder_embedding =  tf.keras.layers.Embedding( vocab_size, 200 , mask_zero=True )(encoder_inputs)
-    _ , state_h , state_c = tf.keras.layers.LSTM( 200 , return_state=True )( encoder_embedding )
+    encoder_embedding =  tf.keras.layers.Embedding( vocab_size, 512 , mask_zero=True )(encoder_inputs)
+    _ , state_h , state_c = tf.keras.layers.LSTM( 512 , return_state=True )( encoder_embedding )
     encoder_states = [ state_h , state_c ]
 
     decoder_inputs = tf.keras.layers.Input(shape=(None, ), dtype='int32',)
-    decoder_embedding = tf.keras.layers.Embedding( vocab_size, 200 , mask_zero=True) (decoder_inputs)
-    decoder_lstm = tf.keras.layers.LSTM( 200 , return_state=True , return_sequences=True )
+    decoder_embedding = tf.keras.layers.Embedding( vocab_size, 512 , mask_zero=True) (decoder_inputs)
+    decoder_lstm = tf.keras.layers.LSTM( 512 , return_state=True , return_sequences=True )
     decoder_outputs , _ , _ = decoder_lstm ( decoder_embedding , initial_state=encoder_states )
     decoder_dense = tf.keras.layers.Dense( vocab_size , activation=tf.keras.activations.softmax )
     output = decoder_dense ( decoder_outputs )
@@ -63,7 +53,6 @@ def generate_batch(encoder_input_data, decoder_input_data, BATCH_SIZE):
 
 
 if __name__ == "__main__":
-
     questions = pickle.load(open(path_questions, "rb"))
     answers = pickle.load(open(path_answers, "rb"))
     tokenizer = pickle.load(open(path_tokenizer, "rb"))

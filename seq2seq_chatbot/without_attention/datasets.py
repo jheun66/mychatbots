@@ -24,11 +24,6 @@ import pickle
 import numpy as np
 import pickle
 
-# 파일 기준 경로
-path_questions = "./questions.p"
-path_answers = "./answers.p"
-path_voc_size = "./voc_size.p"
-
 path_to_zip = tf.keras.utils.get_file(
     'cornell_movie_dialogs.zip',
     origin=
@@ -60,7 +55,7 @@ def preprocess_sentence(sentence):
     return sentence
 
 
-def load_conversations(MAX_SAMPLES):
+def load_conversations():
     # dictionary of line id to text
     id2line = {}
     with open(path_to_movie_lines, errors='ignore') as file:
@@ -79,17 +74,15 @@ def load_conversations(MAX_SAMPLES):
         for i in range(len(conversation) - 1):
             inputs.append(preprocess_sentence(id2line[conversation[i]]))
             outputs.append(preprocess_sentence(id2line[conversation[i + 1]]))
-            if len(inputs) >= MAX_SAMPLES:
-                return inputs, outputs
     return inputs, outputs
 
 # Tokenize, filter and pad sentences
 def tokenize_and_filter():
-    inputs, outputs = load_conversations(MAX_SAMPLES=100000)
+    inputs, outputs = load_conversations()
 
     # Build tokenizer using tfds for both questions and answers
     tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
-        inputs + outputs, target_vocab_size=2**13)
+        inputs + outputs, target_vocab_size=2**15)
     
     # Define start and end token to indicate the start and end of a sentence
     START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
@@ -121,19 +114,10 @@ def tokenize_and_filter():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
 
-    questions, answers, VOCAB_SIZE = tokenize_and_filter()
-
-    pickle.dump(questions, open(path_questions, "wb"))
-    pickle.dump(answers, open(path_answers, "wb"))
-    pickle.dump(VOCAB_SIZE, open(path_voc_size, "wb"))
-=======
-    
     questions, answers, tokenizer = tokenize_and_filter()
 
     pickle.dump(questions, open(path_questions, "wb"))
     pickle.dump(answers, open(path_answers, "wb"))
     pickle.dump(tokenizer, open(path_tokenizer, "wb"))
->>>>>>> ef8df6e3fff984f6cdc282084fcc05f39da7f630
 
